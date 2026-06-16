@@ -1,0 +1,22 @@
+{
+  "name": "tech-activities",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Atividades adhoc da Dataduca para testar rapidamente com os alunos.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.16",
+    "@vitejs/plugin-react-swc": "^4.1.0",
+    "tailwindcss": "^4.1.16",
+    "vite": "^7.1.7"
+  }
+}
