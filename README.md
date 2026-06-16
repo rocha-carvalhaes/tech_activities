@@ -40,4 +40,4 @@ Abra o endereço que o Vite imprimir (por padrão `http://localhost:5173`).
 
 | Atividade | Status | Descrição |
 | --- | --- | --- |
-| 🦘 Personagem Saltador | Em construção | Editar atributos do personagem por código (`size`, `color`, `jump`, `speed`) e jogar um salto entre plataformas verticais. |
+| 🦘 Personagem Saltador | Jogável | Editar atributos do personagem por código (`size`, `color`, `jump`, `speed`) e jogar um salto entre plataformas verticais. Ensina tipos (int/float/string) — erros de tipo bloqueiam o Play. |

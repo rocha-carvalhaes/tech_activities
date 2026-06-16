@@ -13,6 +13,7 @@
 //   emoji     — ícone leve para o card (sem dependências de assets)
 //   component — componente React da atividade
 import CharacterJump from './character-jump/index.jsx';
+import SlimePlatformer from './slime-platformer/index.jsx';
 
 export const activities = [
   {
@@ -22,6 +23,14 @@ export const activities = [
       'Edite os atributos do personagem por código e jogue o salto entre plataformas.',
     emoji: '🦘',
     component: CharacterJump,
+  },
+  {
+    id: 'slime-platformer',
+    title: 'Slime Aventureiro',
+    subtitle:
+      'Edite o personagem e monte a fase com caixas por código; chegue até a estrela.',
+    emoji: '🟢',
+    component: SlimePlatformer,
   },
 ];
 
