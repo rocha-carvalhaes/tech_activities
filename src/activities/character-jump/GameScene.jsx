@@ -122,6 +122,16 @@ function GameScene({ attrs, running, onGameOver }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
 
+  // Sincroniza o engine com os atributos ao vivo durante o jogo (color é reativo via
+  // prop JSX; speed/jump/radius precisam ser injetados no engine diretamente).
+  useEffect(() => {
+    if (!running) return;
+    const eng = engineRef.current;
+    eng.speed = attrs.speed;
+    eng.jumpV = attrs.jump;
+    eng.radius = slimeRadius(attrs.size);
+  }, [running, attrs.speed, attrs.jump, attrs.size]);
+
   // Preview "pronto": fora do jogo (e fora do game over), reflete os atributos ao vivo.
   useEffect(() => {
     if (running || over) return;

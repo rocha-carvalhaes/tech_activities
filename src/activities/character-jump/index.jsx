@@ -11,23 +11,19 @@ import { DEFAULT_CODE } from './constants';
 function CharacterJump({ onBack }) {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [running, setRunning] = useState(false);
-  const [runAttrs, setRunAttrs] = useState(null);
 
   const parsed = useMemo(() => parseAttrs(code), [code]);
 
-  // Play congela um snapshot dos atributos atuais (editar durante o jogo não
-  // afeta a partida em andamento — só vale no próximo Play).
   const startGame = useCallback(() => {
     if (!parsed.ok) return;
-    setRunAttrs(parsed.values);
     setRunning(true);
-  }, [parsed.ok, parsed.values]);
+  }, [parsed.ok]);
 
   const stopGame = useCallback(() => setRunning(false), []);
   const handleGameOver = useCallback(() => setRunning(false), []);
 
-  // Atributos da cena: snapshot durante o jogo; valores ao vivo quando parado.
-  const sceneAttrs = running && runAttrs ? runAttrs : parsed.values;
+  // Atributos sempre ao vivo: editar o código reflete imediatamente no jogo.
+  const sceneAttrs = parsed.values;
 
   return (
     <ActivityShell
