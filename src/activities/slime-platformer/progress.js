@@ -5,7 +5,7 @@
 // um reset natural entre turmas/aulas.
 
 const KEY = 'slime-platformer:progress';
-const TTL_MS = 10 * 60 * 1000;
+const TTL_MS = 30 * 60 * 1000;
 
 function defaultProgress() {
   return { unlocked: 1, completed: [] };

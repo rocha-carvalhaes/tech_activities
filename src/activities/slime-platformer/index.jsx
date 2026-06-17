@@ -9,7 +9,7 @@ import { readProgress, markComplete } from './progress';
 
 // Plataformer lateral em 10 fases. A entrada é a grade de fases; ao escolher uma,
 // o aluno cai no editor (sandbox: tudo editável) e joga. Concluir desbloqueia a
-// próxima. Progresso em localStorage com TTL de 10 min (ver progress.js).
+// próxima. Progresso em localStorage com TTL de 30 min (ver progress.js).
 function SlimePlatformer({ onBack }) {
   const [progress, setProgress] = useState(() => readProgress());
   const [level, setLevel] = useState(null); // null = tela de seleção
