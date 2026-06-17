@@ -34,7 +34,7 @@ export const ATTR_DEFS = [
 export const DEFAULT_CODE = [
   'size = 3',
   'color = "teal"',
-  'jump = 8',
+  'jump = 10',
   'speed = 3.0',
 ].join('\n');
 
