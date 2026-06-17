@@ -33,7 +33,7 @@ function Home({ onOpen }) {
                   <img
                     src={import.meta.env.BASE_URL + a.cover}
                     alt={a.title}
-                    className="w-full h-36 object-cover rounded-xl mb-3"
+                    className="w-full h-36 object-cover object-bottom rounded-xl mb-3"
                   />
                 ) : (
                   <div className="text-3xl mb-3">{a.emoji}</div>
