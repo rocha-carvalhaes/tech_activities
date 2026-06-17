@@ -41,3 +41,4 @@ Abra o endereço que o Vite imprimir (por padrão `http://localhost:5173`).
 | Atividade | Status | Descrição |
 | --- | --- | --- |
 | 🦘 Personagem Saltador | Jogável | Editar atributos do personagem por código (`size`, `color`, `jump`, `speed`) e jogar um salto entre plataformas verticais. Ensina tipos (int/float/string) — erros de tipo bloqueiam o Play. |
+| 🛠️ Fábrica de Fases | Jogável | Criar fases por código (caixas + objetivo), vencer para validar e publicar para a turma; jogar as fases dos colegas com cronômetro e ranking de tempo por fase. Usa o Firebase compartilhado (coleções `creationLevels` e `creationScores`). |

@@ -14,6 +14,7 @@
 //   component — componente React da atividade
 import CharacterJump from './character-jump/index.jsx';
 import SlimePlatformer from './slime-platformer/index.jsx';
+import FabricaDeFases from './fabrica-de-fases/index.jsx';
 
 export const activities = [
   {
@@ -33,6 +34,15 @@ export const activities = [
     emoji: '🟢',
     cover: 'covers/slime-aventureiro.png',
     component: SlimePlatformer,
+  },
+  {
+    id: 'fabrica-de-fases',
+    title: 'Fábrica de Fases',
+    subtitle:
+      'Crie fases por código e compartilhe com a turma; jogue as dos colegas com ranking de tempo.',
+    emoji: '🛠️',
+    cover: 'covers/fabrica-fases.png',
+    component: FabricaDeFases,
   },
 ];
 
