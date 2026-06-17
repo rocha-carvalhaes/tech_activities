@@ -33,7 +33,7 @@ function starPath(cx, cy, outer, inner) {
 
 // Cena do plataformer. Estados parado/jogando/vitória, mesmo padrão do jogo 1.
 // O slime e o mundo ficam dentro de um grupo transladado por -cameraX (a câmera).
-function GameScene({ attrs, running, onWin, onPlayAgain }) {
+function GameScene({ attrs, running, onWin, onPlayAgain, onNext, hasNext, onBackToLevels }) {
   const radius = slimeRadius(attrs.size);
 
   const engineRef = useRef(null);
@@ -100,6 +100,23 @@ function GameScene({ attrs, running, onWin, onPlayAgain }) {
     return () => cancelAnimationFrame(rafRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running]);
+
+  // Sincroniza o engine com os atributos ao vivo durante o jogo.
+  // color é reativo via prop JSX; os demais precisam ser injetados diretamente.
+  useEffect(() => {
+    if (!running) return;
+    const eng = engineRef.current;
+    eng.speed = attrs.speed;
+    eng.jumpImpulse = attrs.jump;
+    eng.side = attrs.size * CELL;
+    const mkBox = (col, row) => ({
+      left: cellLeft(col), top: cellTopY(row),
+      right: cellLeft(col) + CELL, bottom: cellTopY(row) + CELL,
+    });
+    eng.boxes = (attrs.boxes || []).map((b) => mkBox(b.col, b.row));
+    eng.goalBox = mkBox(attrs.goal.col, attrs.goal.row);
+    eng.worldWidth = levelWorldWidth(attrs);
+  }, [running, attrs.speed, attrs.jump, attrs.size, attrs.boxes, attrs.goal]);
 
   // Preview ao vivo quando parado (reflete size/color/caixas/goal).
   useEffect(() => {
@@ -235,14 +252,36 @@ function GameScene({ attrs, running, onWin, onPlayAgain }) {
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/85 backdrop-blur-sm rounded-2xl">
           <div className="text-5xl mb-2">⭐</div>
           <h2 className="text-2xl font-bold text-[#333333] mb-1">Você chegou!</h2>
-          <p className="text-[#777777] mb-5">Objetivo coletado.</p>
-          <button
-            type="button"
-            onClick={onPlayAgain}
-            className="px-5 py-2 rounded-xl font-semibold text-[#1e3a24] bg-[#B8E3C0] hover:bg-[#a7d9b2] shadow-sm"
-          >
-            Jogar de novo
-          </button>
+          <p className="text-[#777777] mb-5">
+            {hasNext ? 'Fase desbloqueada!' : 'Você terminou todas as fases! 🎉'}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {hasNext && onNext && (
+              <button
+                type="button"
+                onClick={onNext}
+                className="px-5 py-2 rounded-xl font-semibold text-[#1e3a24] bg-[#B8E3C0] hover:bg-[#a7d9b2] shadow-sm"
+              >
+                Próximo nível →
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onPlayAgain}
+              className="px-5 py-2 rounded-xl font-semibold text-[#333333] bg-white border border-[#D9D9D9] hover:bg-[#f1faf3] shadow-sm"
+            >
+              Jogar de novo
+            </button>
+            {onBackToLevels && (
+              <button
+                type="button"
+                onClick={onBackToLevels}
+                className="px-5 py-2 rounded-xl font-semibold text-[#333333] bg-white border border-[#D9D9D9] hover:bg-[#f1faf3] shadow-sm"
+              >
+                Voltar às fases
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
