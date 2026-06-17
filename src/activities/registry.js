@@ -22,6 +22,7 @@ export const activities = [
     subtitle:
       'Edite os atributos do personagem por código e jogue o salto entre plataformas.',
     emoji: '🦘',
+    cover: 'covers/personagem-saltador.png',
     component: CharacterJump,
   },
   {
@@ -30,6 +31,7 @@ export const activities = [
     subtitle:
       'Edite o personagem e monte a fase com caixas por código; chegue até a estrela.',
     emoji: '🟢',
+    cover: 'covers/slime-aventureiro.png',
     component: SlimePlatformer,
   },
 ];

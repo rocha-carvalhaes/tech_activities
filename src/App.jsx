@@ -29,7 +29,15 @@ function Home({ onOpen }) {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {activities.map((a) => (
               <Card key={a.id} as="button" onClick={() => onOpen(a.id)}>
-                <div className="text-3xl mb-3">{a.emoji}</div>
+                {a.cover ? (
+                  <img
+                    src={import.meta.env.BASE_URL + a.cover}
+                    alt={a.title}
+                    className="w-full h-36 object-cover rounded-xl mb-3"
+                  />
+                ) : (
+                  <div className="text-3xl mb-3">{a.emoji}</div>
+                )}
                 <h2 className="text-lg font-semibold text-[#333333]">
                   {a.title}
                 </h2>
