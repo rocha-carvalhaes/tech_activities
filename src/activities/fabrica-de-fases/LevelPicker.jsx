@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { listLevels, levelsEnabled } from './levelsStore';
+import { listLevels, levelsEnabled, incrementPlayCount } from './levelsStore';
 import LevelPreview from './LevelPreview';
 
 // Tela de entrada da Fábrica de Fases: de cara o aluno escolhe CRIAR uma fase
@@ -80,7 +80,7 @@ function LevelPicker({ onCreate, onPlay }) {
               <button
                 key={lvl.id}
                 type="button"
-                onClick={() => onPlay(lvl)}
+                onClick={() => { incrementPlayCount(lvl.id); onPlay(lvl); }}
                 className="text-left rounded-2xl border border-[#D9D9D9] bg-white p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
               >
                 <LevelPreview code={lvl.code} />
@@ -88,9 +88,14 @@ function LevelPicker({ onCreate, onPlay }) {
                 <p className="text-xs text-[#777] truncate">
                   {lvl.author ? `por ${lvl.author}` : 'autor anônimo'}
                 </p>
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-[#1e3a24]">
-                  ▶ Jogar
-                </span>
+                <div className="mt-3 flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#1e3a24]">
+                    ▶ Jogar
+                  </span>
+                  <span className="text-xs text-[#999]">
+                    {lvl.playCount} {lvl.playCount === 1 ? 'jogada' : 'jogadas'}
+                  </span>
+                </div>
               </button>
             ))}
           </div>

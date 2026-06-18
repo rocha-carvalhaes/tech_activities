@@ -2,17 +2,20 @@
 // `firebase` direto: usa só estas funções. Se o Firebase não estiver configurado
 // (db === null), degradam graciosamente (lista vazia / erro claro ao salvar).
 //
-// Coleção `creationLevels`: { name, author, code, createdAt }.
+// Coleção `creationLevels`: { name, author, code, createdAt, playCount }.
 // Obs.: as regras de segurança do Firestore precisam permitir leitura/escrita
 // nesta coleção (igual já acontece com `scores` do Personagem Saltador).
 import {
   collection,
   addDoc,
   getDocs,
+  doc,
+  updateDoc,
   query,
   orderBy,
   limit,
   serverTimestamp,
+  increment,
 } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 
@@ -23,14 +26,23 @@ export const AUTHOR_MAX = 24;
 export const levelsEnabled = db !== null;
 
 function mapDocs(snap) {
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data(), playCount: d.data().playCount ?? 0 }));
 }
 
-// Lista as fases mais recentes da turma (ordenadas no servidor por data).
+// Lista as fases da turma, ordenadas por jogadas (mais jogadas primeiro).
+// O fetch usa createdAt para garantir que fases antigas (sem playCount) apareçam;
+// a ordenação por popularidade é feita client-side.
 export async function listLevels(n = 60) {
   if (!db) return [];
   const q = query(collection(db, COLLECTION), orderBy('createdAt', 'desc'), limit(n));
-  return mapDocs(await getDocs(q));
+  const levels = mapDocs(await getDocs(q));
+  return levels.sort((a, b) => b.playCount - a.playCount);
+}
+
+// Incrementa o contador de jogadas de uma fase. Fire-and-forget — erros são silenciosos.
+export async function incrementPlayCount(levelId) {
+  if (!db) return;
+  await updateDoc(doc(db, COLLECTION, levelId), { playCount: increment(1) });
 }
 
 // Cria (publica) uma nova fase. Retorna o id do documento criado.
@@ -45,6 +57,7 @@ export async function createLevel({ name, author, code }) {
     author: cleanAuthor,
     code: String(code),
     createdAt: serverTimestamp(),
+    playCount: 0,
   });
   return ref.id;
 }
