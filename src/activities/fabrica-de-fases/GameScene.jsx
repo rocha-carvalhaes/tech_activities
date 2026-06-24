@@ -2,7 +2,7 @@ import { useRef, useState, useEffect, useLayoutEffect, useCallback } from 'react
 import Slime from '../shared/Slime';
 import { poseFromState } from '../shared/slimePoses';
 import { PlatformerEngine } from './engine';
-import { formatTime } from './formatTime';
+import { formatTime } from '../shared/formatTime';
 import {
   VIEW_W,
   VIEW_H,

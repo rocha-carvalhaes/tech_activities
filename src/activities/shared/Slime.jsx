@@ -6,7 +6,20 @@ import { POSES } from './slimePoses';
 //
 // Props: color, radius, pose ('idle'|'stretch'|'fall'|'squash'|'blink'),
 //        x, y (translação do centro na cena).
-function Slime({ color = 'teal', radius = 18, pose = 'idle', x = 0, y = 0 }) {
+//
+// Props opcionais (aditivas; quando ausentes, o slime é idêntico ao de antes):
+//   eyeTarget — vetor { dx, dy } normalizado em [-1,1] que desloca as pupilas em
+//               direção a um alvo (ex.: o cursor do mouse). null = olhar centrado.
+//   hatNode   — nó SVG (chapéu) renderizado ancorado no topo da cabeça (0, -r).
+function Slime({
+  color = 'teal',
+  radius = 18,
+  pose = 'idle',
+  x = 0,
+  y = 0,
+  eyeTarget = null,
+  hatNode = null,
+}) {
   const r = radius;
   const p = POSES[pose] ?? POSES.idle;
 
@@ -23,6 +36,13 @@ function Slime({ color = 'teal', radius = 18, pose = 'idle', x = 0, y = 0 }) {
   const eyeX = 0.34 * r;
   const eyeY = p.eyeY * r;
   const stroke = Math.max(1, r * 0.07);
+
+  // Deslocamento das pupilas em direção ao alvo (cursor). Clampado a uma fração
+  // do raio do olho para o olhar não "escapar" da esclera.
+  const clamp1 = (n) => Math.max(-1, Math.min(1, n));
+  const maxShift = eyeR * 0.5;
+  const px = eyeTarget ? clamp1(eyeTarget.dx) * maxShift : 0;
+  const py = eyeTarget ? clamp1(eyeTarget.dy) * maxShift : 0;
 
   // Pivot do squash/stretch na base do slime.
   const deform = `translate(0 ${u(1)}) scale(${p.sx} ${p.sy}) translate(0 ${-u(1)})`;
@@ -47,11 +67,11 @@ function Slime({ color = 'teal', radius = 18, pose = 'idle', x = 0, y = 0 }) {
           </>
         ) : (
           <>
-            <circle cx={-eyeX} cy={eyeY} r={eyeR} fill="#23232f" />
-            <circle cx={eyeX} cy={eyeY} r={eyeR} fill="#23232f" />
-            {/* catchlights */}
-            <circle cx={-eyeX + eyeR * 0.35} cy={eyeY - eyeR * 0.4} r={eyeR * 0.32} fill="rgba(255,255,255,0.9)" />
-            <circle cx={eyeX + eyeR * 0.35} cy={eyeY - eyeR * 0.4} r={eyeR * 0.32} fill="rgba(255,255,255,0.9)" />
+            <circle cx={-eyeX + px} cy={eyeY + py} r={eyeR} fill="#23232f" />
+            <circle cx={eyeX + px} cy={eyeY + py} r={eyeR} fill="#23232f" />
+            {/* catchlights (acompanham a pupila) */}
+            <circle cx={-eyeX + px + eyeR * 0.35} cy={eyeY + py - eyeR * 0.4} r={eyeR * 0.32} fill="rgba(255,255,255,0.9)" />
+            <circle cx={eyeX + px + eyeR * 0.35} cy={eyeY + py - eyeR * 0.4} r={eyeR * 0.32} fill="rgba(255,255,255,0.9)" />
           </>
         )}
 
@@ -61,6 +81,9 @@ function Slime({ color = 'teal', radius = 18, pose = 'idle', x = 0, y = 0 }) {
         ) : (
           <path d={`M ${-eyeR * 1.1},${eyeY + eyeR * 1.7} q ${eyeR * 1.1},${eyeR * 1.1} ${eyeR * 2.2},0`} fill="none" stroke="rgba(20,20,30,0.5)" strokeWidth={eyeR * 0.42} strokeLinecap="round" />
         )}
+
+        {/* chapéu opcional, ancorado no topo da cabeça (0, -r) */}
+        {hatNode && <g transform={`translate(0 ${u(-1)})`}>{hatNode}</g>}
       </g>
     </g>
   );

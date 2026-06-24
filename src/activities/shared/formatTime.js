@@ -2,6 +2,7 @@
 //   < 1 min  → "12.34s"
 //   ≥ 1 min  → "1:05.20"
 // Usa centésimos de segundo (2 casas) para diferenciar tempos próximos no ranking.
+// Compartilhado entre atividades (Fábrica de Fases, Caça ao Tesouro).
 export function formatTime(ms) {
   const totalCs = Math.max(0, Math.round(Number(ms) / 10)); // centésimos
   const cs = totalCs % 100;

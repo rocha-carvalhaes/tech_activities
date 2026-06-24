@@ -15,6 +15,7 @@
 import CharacterJump from './character-jump/index.jsx';
 import SlimePlatformer from './slime-platformer/index.jsx';
 import FabricaDeFases from './fabrica-de-fases/index.jsx';
+import CacaAoTesouro from './caca-ao-tesouro/index.jsx';
 
 export const activities = [
   {
@@ -43,6 +44,15 @@ export const activities = [
     emoji: '🛠️',
     cover: 'covers/fabrica-fases.png',
     component: FabricaDeFases,
+  },
+  {
+    id: 'caca-ao-tesouro',
+    title: 'Caça ao Tesouro',
+    subtitle:
+      'Circuito de 3 desafios temáticos (caça-palavras, memória e desembaralhar): colete os números e abra o baú.',
+    emoji: '🗺️',
+    cover: 'covers/caca-ao-tesouro.svg',
+    component: CacaAoTesouro,
   },
 ];
 

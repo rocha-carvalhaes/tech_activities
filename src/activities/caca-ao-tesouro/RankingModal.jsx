@@ -1,16 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getTopTimes, submitTime, rankingEnabled, NAME_MAX } from './ranking';
 import { formatTime } from '../shared/formatTime';
+import {
+  getTopGeneral,
+  getTopCategory,
+  submitTime,
+  rankingEnabled,
+  NAME_MAX,
+} from './ranking';
 
-// Modal de vitória com ranking de TEMPO da fase (Firestore). Mesmo visual/fluxo
-// do Personagem Saltador, mas uma única lista (os melhores tempos desta fase) e
-// menor tempo = melhor. Registro inline do tempo da run atual.
-function TimeRankingModal({ levelId, levelName, timeMs, modified = false, onPlayAgain, onBackToList }) {
-  const [rows, setRows] = useState([]);
+// Modal final: tempo do circuito + mini-ranking (Geral / Tema) e registro inline
+// do nome. Mesmo visual do GameOverModal do Personagem Saltador, mas por TEMPO.
+function RankingModal({ themeId, themeLabel, themeEmoji, elapsedMs, onContinue }) {
+  const [tab, setTab] = useState('geral');
+  const [general, setGeneral] = useState([]);
+  const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // Registro inline.
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -25,13 +31,15 @@ function TimeRankingModal({ levelId, levelName, timeMs, modified = false, onPlay
     setLoading(true);
     setError(false);
     try {
-      setRows(await getTopTimes(levelId, 5));
+      const [g, c] = await Promise.all([getTopGeneral(5), getTopCategory(themeId, 5)]);
+      setGeneral(g);
+      setCategory(c);
     } catch {
       setError(true);
     } finally {
       setLoading(false);
     }
-  }, [levelId]);
+  }, [themeId]);
 
   useEffect(() => {
     load();
@@ -43,7 +51,7 @@ function TimeRankingModal({ levelId, levelName, timeMs, modified = false, onPlay
       if (!name.trim() || submitting) return;
       setSubmitting(true);
       try {
-        const id = await submitTime({ levelId, name, timeMs });
+        const id = await submitTime({ name, timeMs: elapsedMs, themeId });
         setSubmittedId(id);
         setShowForm(false);
         await load();
@@ -53,28 +61,39 @@ function TimeRankingModal({ levelId, levelName, timeMs, modified = false, onPlay
         setSubmitting(false);
       }
     },
-    [name, submitting, levelId, timeMs, load]
+    [name, submitting, elapsedMs, themeId, load]
   );
 
+  const rows = tab === 'geral' ? general : category;
   const registered = submittedId !== null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="w-full max-w-[380px] rounded-2xl bg-white shadow-xl p-6 flex flex-col items-center">
-        <div className="text-4xl mb-1">⭐</div>
-        <h2 className="text-2xl font-bold text-[#333333]">Você chegou!</h2>
+        <h2 className="text-2xl font-bold text-[#333333]">Tesouro encontrado! 🎉</h2>
         <p className="text-[#777777] mt-1 mb-4">
-          Seu tempo: <strong className="text-[#333] font-mono">{formatTime(timeMs)}</strong>
+          Seu tempo: <strong className="text-[#333]">{formatTime(elapsedMs)}</strong>
         </p>
 
-        {/* Ranking da fase */}
         <div className="w-full">
-          <div className="px-1 pb-1">
-            <span className="text-sm font-semibold text-[#555]">
-              Melhores tempos {levelName ? `· ${levelName}` : ''}
-            </span>
+          <div className="flex gap-1 px-1">
+            <Tab active={tab === 'geral'} onClick={() => setTab('geral')}>
+              Geral
+            </Tab>
+            <Tab active={tab === 'tema'} onClick={() => setTab('tema')}>
+              Tema
+            </Tab>
           </div>
-          <div className="rounded-xl border border-[#D9D9D9] bg-[#F5F6F7] p-3 min-h-[164px]">
+
+          <div className="rounded-xl rounded-tl-none border border-[#D9D9D9] bg-[#F5F6F7] p-3 min-h-[164px]">
+            {tab === 'tema' && (
+              <div className="flex flex-wrap gap-1 mb-2">
+                <span className="text-[10px] font-mono text-[#555] bg-white border border-[#D9D9D9] rounded-full px-2 py-0.5">
+                  {themeEmoji} {themeLabel}
+                </span>
+              </div>
+            )}
+
             {loading ? (
               <p className="text-sm text-[#777] text-center py-8">Carregando…</p>
             ) : error ? (
@@ -105,14 +124,8 @@ function TimeRankingModal({ levelId, levelName, timeMs, modified = false, onPlay
           </div>
         </div>
 
-        {/* Registro inline */}
         <div className="w-full mt-4">
-          {modified ? (
-            <p className="text-center text-sm text-[#8a6d3b] bg-[#fcf3d9] border border-[#f0e0a8] rounded-xl px-3 py-2">
-              Você modificou esta fase — o tempo não entra no ranking. Volte ao código
-              original para registrar.
-            </p>
-          ) : registered ? (
+          {registered ? (
             <p className="text-center text-sm font-semibold text-[#1e3a24]">Registrado! ✓</p>
           ) : showForm ? (
             <form onSubmit={handleSubmit} className="flex gap-2">
@@ -139,30 +152,37 @@ function TimeRankingModal({ levelId, levelName, timeMs, modified = false, onPlay
               disabled={!rankingEnabled}
               className="w-full px-5 py-2 rounded-xl font-semibold text-[#1e3a24] bg-[#B8E3C0] hover:bg-[#a7d9b2] shadow-sm disabled:opacity-50"
             >
-              Registrar meu tempo
+              Registrar no ranking
             </button>
           )}
         </div>
 
-        <div className="w-full mt-2 flex gap-2">
-          <button
-            type="button"
-            onClick={onPlayAgain}
-            className="flex-1 px-5 py-2 rounded-xl font-semibold text-[#333] bg-[#F5F6F7] border border-[#D9D9D9] hover:bg-[#ebecee]"
-          >
-            Jogar de novo
-          </button>
-          <button
-            type="button"
-            onClick={onBackToList}
-            className="flex-1 px-5 py-2 rounded-xl font-semibold text-[#333] bg-[#F5F6F7] border border-[#D9D9D9] hover:bg-[#ebecee]"
-          >
-            Voltar à lista
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onContinue}
+          className="w-full mt-2 px-5 py-2 rounded-xl font-semibold text-[#333] bg-[#F5F6F7] border border-[#D9D9D9] hover:bg-[#ebecee]"
+        >
+          Jogar de novo
+        </button>
       </div>
     </div>
   );
 }
 
-export default TimeRankingModal;
+function Tab({ active, onClick, children }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-4 py-1.5 text-sm font-semibold rounded-t-lg border border-b-0 transition-colors ${
+        active
+          ? 'bg-[#F5F6F7] border-[#D9D9D9] text-[#333] -mb-px'
+          : 'bg-transparent border-transparent text-[#999] hover:text-[#555]'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+export default RankingModal;
